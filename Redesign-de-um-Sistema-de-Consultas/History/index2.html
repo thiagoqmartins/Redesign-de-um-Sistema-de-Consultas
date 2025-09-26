@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajuste de Prioridades</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ajuste de Prioridades</h1>
+        <div class="buttons">
+            <button class="active">TU</button>
+            <button>TR</button>
+            <button>SV-TU</button>
+            <button>SV-TR</button>
+            <button>MOD-PROJ</button>
+        </div>
+    </header>
+    <section class="info">  
+    </section>
+    <section class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Tipo Nota</th>
+                    <th>Número Nota</th>
+                    <th>Cliente</th>
+                    <th>Descrição</th>
+                    <th>Solicitante</th>
+                    <th>Data Criação</th>
+                    <th>Posição</th>
+                </tr>
+            </thead>
+            <tbody id="dados-dinamicos">
+                <!-- Os dados serão carregados dinamicamente aqui -->
+            </tbody>
+        </table>
+    </section>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Gestão de Solicitações</title>
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="./css/login.css" /> <!-- CSS separado só para o login -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+  <div class="header">
+    <div class="cont">
+      <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
+        onclick="window.location.href='/'">
+    </div>
+    <div class="cont2">
+      <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+    </div>
+
+  </div>
+
+  <div class="frameForm">
+    <div class="login-container">
+      <h2>Bem Vindo!</h2>
+      <div id="mensagemErro" style="display: none; color: red; margin-top: 5px;">Usuário ou senha inválidos.</div>
+      <br id="mensagemErro1" style="display: block">
+      <form method="POST" action="/login">
+        <input type="text" name="username" placeholder="Usuário" id="usuarioLogin" required
+          autocomplete="current-password">
+        <!-- <input type="password" name="password" placeholder="Senha" required /> -->
+        <div class="campo-senha">
+          <input type="password" name="password" id="senhaLogin" placeholder="Senha" required
+            autocomplete="current-password">
+          <!-- <input type="password" id="senhaLogin" placeholder="Senha" required> -->
+          <button type="button" id="toggleSenhaLogin" class="botao-toggle" tabindex="-1"> <span
+              class="material-symbols-outlined">visibility</span></button>
+        </div><br>
+        <button type="submit">Entrar</button>
+        <p><a href="#">Esqueçeu a Senha?</a></p>
+        <br>
+      </form>
+      <button onclick="mostrarRegistro()">Solicitar Acesso</button>
+      <!-- <h3>USER: ADMIN / PASSWORD: 123</h3> -->
+    </div>
+  </div>
+  <!-- Modal de registro -->
+  <!-- Overlay do formulário -->
+  <div id="registroOverlay">
+    <!-- Modal centralizado -->
+    <div id="registroForm">
+      <div class="botao_fechar">
+        <button id="fecharDiv">X</button>
+      </div>
+      <h2>Registrar</h2>
+      <!-- <form id="formRegistro" method="POST" action="/regs"> -->
+      <form id="formRegistro">
+        <input type="text" id="nome" placeholder="Nome completo" required autocomplete="current-password"><br>
+        <input type="text" id="usuario" placeholder="Usuário" required autocomplete="current-password"><br>
+        <input type="email" id="email" placeholder="Email" required autocomplete="current-password"><br>
+        <!-- <input type="password" id="senha" placeholder="Senha" required><br> -->
+        <div class="campo-senha">
+          <input type="password" id="senhaRegistro" placeholder="Senha" required autocomplete="current-password">
+          <button type="button" id="toggleSenhaRegistro" class="botao-toggle" tabindex="-1"><span
+              class="material-symbols-outlined">visibility</span></button>
+        </div>
+        <div class="campo-senha">
+          <input type="password" id="senhaRegistroConf" placeholder="Senha" required autocomplete="current-password">
+          <button type="button" id="toggleSenhaRegistroConf" class="botao-toggle" tabindex="-1"><span
+              class="material-symbols-outlined">visibility</span></button>
+        </div><br>
+        <button type="submit">Enviar</button>
+      </form>
+      <div id="exibirMensagem" style="display: none;"></div>
+    </div>
+  </div>
+
+  <footer id="footer">
+  </footer>
+  <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
+  <script src="./js/login.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Consultas Claims</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="cont">
+            <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo">
+        </div>
+        <div class="cont2">
+            <h1>Gestão de Consultas Claims</h1>
+        </div>
+    </header>
+    <div class="body_geral">
+        <div class="cont_botoes">
+            <div class="btn">Turbinas</div>
+            <div class="btn">Redutores</div>
+            <div class="btn">Serviços Turbinas</div>
+            <div class="btn">Serviços Redutores</div>
+            <div class="btn">Modificação de Projeto</div>
+        </div>
+
+        <div class="funcoes">
+            <div class="frame1">
+                <input type="radio" id="Aguardando" name="status">
+                <label for="Aguardando">Aguardando</label>
+                <input type="radio" id="Executando" name="status">
+                <label for="Executando">Executando</label>
+                <input type="radio" id="Concluido" name="status">
+                <label for="Concluido">Concluído</label>
+            </div>
+            <div class="frame2">
+                TESTE
+            </div>
+        </div>
+        <div class="dados_tabela">
+            <div class="lat_tabela">
+
+            </div>
+            <div class="cont_tabela">
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo</th>
+                            <th>Número Nota</th>
+                            <th>Cliente</th>
+                            <th>Descrição</th>
+                            <th>Solicitante</th>
+                            <th>Data Criação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-body">
+                        <!-- Linhas serão geradas via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="container">
+            <h3>Transação MM03</h3>
+            <label for="MM03">Material SAP:</label>
+            <input type="number" name="material_mm03" id="MM03" autocomplete="on" placeholder="Insira um valor"
+                required>
+            <button id="executar">Executar</button>
+            <p id="status"></p>
+        </div>
+        <div class="container">
+            <h3>Transação MM02</h3>
+            <label for="MM02">Material SAP:</label>
+            <input type="number" name="material_mm02" id="MM02" autocomplete="on" placeholder="Insira um valor"
+                required>
+            <button id="executar1">Executar</button>
+            <p id="status1"></p>
+        </div>
+    </div>
+    <footer>
+        <p>Teste</p>
+    </footer> 
+    <script src="script.js"></script> <!-- Importando o JavaScript externo -->
+
+</body>
+
+
+</html>

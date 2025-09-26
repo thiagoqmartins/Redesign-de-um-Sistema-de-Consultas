@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Consultas Claims - WEN-SZO</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/triagem.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" ng-href="images/favicon2.png" href="images/favicon2.png">
+    <link rel="icon" type="image/png" sizes="32x32" ng-href="images/favicon2.png" href="images/favicon2.png">
+    <link rel="icon" href="images/favicon2.png" type="image/png">
+</head>
+
+<body onload="carregarTabela()">
+    <div class="header">
+        <div class="cont">
+            <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
+                onclick="window.location.href='/'">
+        </div>
+        <div class="cont2">
+            <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+        </div>
+        <div class="cont3">
+            <button id="" class="exit-button" onclick="window.location.href='/logout'"
+                title="Acessar painel de administração">
+                <span class="material-icons">exit_to_app</span></button>
+        </div>
+    </div>
+    <div class="body_geral">
+        <div class="menuTop" style="margin-top: 1em; margin-bottom: 0.8em; margin-left: 2em;">
+            <div class="busca">
+                <span class="material-icons lupa-icone">search</span>
+                <input type="text" id="campoBusca" placeholder="Pesquisar..." class="input-busca" />
+            </div>
+        </div>
+    </div>
+    <div class="dados_tabela">
+        <div class="cont_tabela">
+            <div class="tabela-container">
+                <table class="tabela">
+                    <thead>
+                        <tr>
+                            <th>Seq.</th>
+                            <th>Tipo</th>
+                            <th>Número Nota</th>
+                            <th>Cliente</th>
+                            <th>Descrição</th>
+                            <!-- <th>#TAG</th>
+                            <th>#Claim "ZZ"</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-body">
+                        <!-- Linhas serão geradas via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="minhaDiv">
+            <button id="fecharDiv">X</button>
+            <div id="conteudoDiv">
+                <!-- Conteúdo será inserido via JavaScript -->
+            </div>
+        </div>
+        <div id="telaErro" class="overlay" style="display: none;">
+            <div class="overlay-content">
+                <p>⚠️ Por favor, selecione uma opção.</p>
+                <button onclick="fecharTelaErro()">OK</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <footer id="footer">
+    </footer>
+    <script src="./js/triagem.js"></script> <!-- Importando o JavaScript externo -->
+    <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>

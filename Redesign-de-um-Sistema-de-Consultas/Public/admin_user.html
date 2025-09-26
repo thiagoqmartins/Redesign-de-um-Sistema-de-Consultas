@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gestão de Consultas Claims - WEN-SZO</title>
+    <link rel="stylesheet" href="./css/admin.css" />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="header">
+        <div class="cont">
+            <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
+                onclick="window.location.href='/'" />
+        </div>
+        <div class="cont2">
+            <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+        </div>
+        <div class="cont3">
+            <button class="exit-button" onclick="window.location.href='/logout'" title="Sair">
+                <span class="material-icons">exit_to_app</span>
+            </button>
+        </div>
+    </div>
+    <div class="menuTop">
+        <div class="busca">
+            <span class="material-icons lupa-icone">search</span>
+            <input type="text" id="campoBusca" placeholder="Pesquisar..." class="input-busca" />
+        </div>
+        <div class="frames_adm">
+            <div class="um">
+                <div id="tabelaUsuarios">
+                    <!-- Tabela será inserida aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer id="footer">
+    </footer>
+    <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
+    <!-- Scripts no final do body para garantir o carregamento do DOM -->
+    <script src="./js/admin.js"></script>
+
+</body>
+
+</html>

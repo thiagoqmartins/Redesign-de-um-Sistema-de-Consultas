@@ -1,0 +1,39 @@
+[
+    {
+      "ID": 1,
+      "Tipo": "Reclamação",
+      "Número Nota": "NF123456",
+      "Cliente": "Empresa Alpha",
+      "Descrição": "Produto chegou danificado",
+      "Solicitante": "João Silva",
+      "Data Criação": "2025-04-17"
+    },
+    {
+      "ID": 2,
+      "Tipo": "Solicitação",
+      "Número Nota": "NF123457",
+      "Cliente": "Empresa Beta",
+      "Descrição": "Pedido de troca de mercadoria",
+      "Solicitante": "Maria Oliveira",
+      "Data Criação": "2025-04-15"
+    },
+    {
+      "ID": 3,
+      "Tipo": "Elogio",
+      "Número Nota": "NF123458",
+      "Cliente": "Empresa Gama",
+      "Descrição": "Atendimento excelente",
+      "Solicitante": "Carlos Mendes",
+      "Data Criação": "2025-04-10"
+    },
+    {
+      "ID": 4,
+      "Tipo": "Reclamação",
+      "Número Nota": "NF123459",
+      "Cliente": "Empresa Delta",
+      "Descrição": "Atraso na entrega",
+      "Solicitante": "Fernanda Lima",
+      "Data Criação": "2025-04-08"
+    }
+  ]
+  

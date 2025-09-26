@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Consultas Claims - WEN-SZO</title>
+    <link rel="stylesheet" href="./css/styles.css">
+    <link rel="stylesheet" href="./css/index.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="16x16" ng-href="images/favicon2.png" href="images/favicon2.png">
+    <link rel="icon" type="image/png" sizes="32x32" ng-href="images/favicon2.png" href="images/favicon2.png">
+    <link rel="icon" href="images/favicon2.png" type="image/png">
+</head>
+
+<body>
+    <div class="header" id="header">
+        <div class="cont">
+            <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
+                onclick="window.location.href='/'">
+        </div>
+        <div class="cont2">
+            <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+        </div>
+        <div class="cont3">
+            <div class="tooltip">
+                <button id="" class="exit-button" onclick="window.location.href='/logout'">
+                    <span class="material-icons">exit_to_app</span>
+                </button>
+                <span class="tooltip-text">Sair</span>
+            </div>
+        </div>
+    </div>
+    <div class="body_geral">
+        <div class="configuracoes" id="container-botoes">
+        </div>
+
+        <div class="bannerNews">
+            <div class="news" id="noticiasBanner">
+                <!-- As notícias serão injetadas aqui via JavaScript -->
+            </div>
+        </div>
+        <div class="menuTop" style="margin-left: 2em;">
+            <div class="busca">
+                <span class="material-icons lupa-icone">search</span>
+                <input type="text" id="campoBusca" placeholder="Pesquisar..." class="input-busca" />
+            </div>
+            <div class="options">
+                <div class="optionsLine">
+                    <label><input type="radio" name="opcao1"> Turbinas </label>
+                    <label><input type="radio" name="opcao1"> Redutores </label>
+                </div>
+                <div class="optionsBU">
+                    <label><input type="radio" name="opcao2"> Equipamentos Novos</label>
+                    <label><input type="radio" name="opcao2"> Serviços</label>
+                    <label><input type="radio" name="opcao2"> Gestão de Projetos</label>
+                </div>
+            </div>
+        </div>
+        <div class="dados_tabela">
+            <div class="cont_tabela">
+                <div class="tabela-container">
+                    <table class="tabela">
+                        <thead class="scrollable-content">
+                            <tr>
+                                <th>Seq.</th>
+                                <th>Tipo</th>
+                                <th>Número Nota</th>
+                                <th>Cliente</th>
+                                <th>Descrição</th>
+                                <th>Solicitante</th>
+                                <th>Data Criação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-body">
+                            <!-- Linhas serão geradas via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="minhaDiv">
+                <button id="fecharDiv">X</button>
+                <div id="conteudoDiv">
+                    <!-- Conteúdo será inserido via JavaScript -->
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <footer id="footer">
+    </footer>
+    <script src="./js/index.js"></script> <!-- Importando o JavaScript externo -->
+    <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+
+</html>

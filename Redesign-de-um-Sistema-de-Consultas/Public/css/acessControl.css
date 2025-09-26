@@ -1,0 +1,263 @@
+.frames_adm {
+    display: block;
+    gap: 10px;
+    padding: 10px;
+    background-color: #fafafa;
+    height: 82vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.um {
+    /* flex: 1; */
+    background-color: #fff;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    overflow: auto;
+    padding: 15px;
+}
+
+#tabelaUsuarios table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    border-radius: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+#tabelaUsuarios thead tr {
+    background-color: #00579D;
+    color: #fff;
+    text-align: left;
+    border-radius: 8px;
+}
+
+#tabelaUsuarios th,
+#tabelaUsuarios td {
+    padding: 2px 16px;
+    vertical-align: middle;
+}
+
+#tabelaUsuarios tbody tr {
+    background-color: #fefefe;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+#tabelaUsuarios tbody tr:hover {
+    background-color: #d9ebff;
+    box-shadow: 0 4px 12px rgba(0, 87, 157, 0.3);
+}
+
+#tabelaUsuarios td {
+    border-bottom: none;
+}
+
+#tabelaUsuarios tbody tr td:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+#tabelaUsuarios tbody tr td:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+#tabelaUsuarios td[data-label="Ações"] {
+    display: flex;
+    gap: 8px;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#tabelaUsuarios button:not(.btn-excluir) {
+    background-color: #006ac027;
+    margin: 0 6px;
+    cursor: pointer;
+    /* background: transparent; */
+    border: none;
+    color: #00579D;
+    font-size: 20px;
+    padding: 6px;
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.25s ease, color 0.25s ease, border-radius 0.25s ease;
+}
+
+#tabelaUsuarios button:not(.btn-excluir):hover {
+    background-color: #337ab7;
+    color: white;
+}
+
+#tabelaUsuarios button.btn-status {
+    font-size: 28px;
+    color: #ccc;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+#tabelaUsuarios button.btn-status.ativo {
+    color: #22c55e;  /* verde moderno (success) */
+}
+
+#tabelaUsuarios button.btn-status.inativo {
+    color: #9ca3af;  /* cinza neutro (disabled) */
+}
+
+#tabelaUsuarios button.btn-status.pendente {
+    color: #f59e0b;  /* amarelo (warning) */
+}
+
+#tabelaUsuarios button.btn-status.suspenso {
+    color: #ef4444;  /* vermelho (danger) */
+}
+
+
+#tabelaUsuarios button.btn-status:hover {
+    background-color: #337ab7;
+    color: white;
+}
+
+/* Botão excluir com cor vermelha */
+#tabelaUsuarios button.btn-excluir {
+    background-color: #ffe5e5;
+    color: #d32f2f;
+    border: none;
+    padding: 6px;
+    margin: 0 6px;
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease;
+}
+
+#tabelaUsuarios button.btn-excluir:hover {
+    background-color: #e53935;
+    color: white;  
+}
+
+#tabelaUsuarios button.btn-excluir .material-icons {
+    font-size: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .frames_adm {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .um,
+    .dois,
+    .tres {
+        height: auto;
+        margin-bottom: 15px;
+    }
+
+    #tabelaUsuarios table,
+    #tabelaUsuarios thead,
+    #tabelaUsuarios tbody,
+    #tabelaUsuarios th,
+    #tabelaUsuarios td,
+    #tabelaUsuarios tr {
+        display: block;
+    }
+
+    #tabelaUsuarios thead tr {
+        display: none;
+    }
+
+    #tabelaUsuarios tbody tr {
+        margin-bottom: 20px;
+        background-color: #fefefe;
+        box-shadow: none;
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    #tabelaUsuarios tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border: none;
+        border-bottom: 1px solid #ddd;
+        font-size: 14px;
+    }
+
+    #tabelaUsuarios tbody td:last-child {
+        border-bottom: none;
+    }
+
+    #tabelaUsuarios tbody td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #00579D;
+        flex: 1;
+    }
+}
+
+#tabelaUsuarios td[data-label="Alterar Nível"],
+#tabelaUsuarios td[data-label="Alterar Status"],
+#tabelaUsuarios td[data-label="Resetar Senha"],
+#tabelaUsuarios td[data-label="Excluir"] {
+    text-align: center;
+    vertical-align: middle;
+}
+
+#tabelaUsuarios td[data-label="Alterar Nível"] button,
+#tabelaUsuarios td[data-label="Alterar Status"] button,
+#tabelaUsuarios td[data-label="Resetar Senha"] button,
+#tabelaUsuarios td[data-label="Excluir"] button {
+    margin: 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Área de busca */
+.busca {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    max-width: 20%;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 2px 6px;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.lupa-icone {
+    font-size: 16px;
+    color: #888;
+    margin-right: 6px;
+    display: flex;
+    align-items: center;
+}
+
+
+.input-busca {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+
+}
+
+.busca {
+    margin-left: 20px !important;
+    margin-right: auto !important;
+}

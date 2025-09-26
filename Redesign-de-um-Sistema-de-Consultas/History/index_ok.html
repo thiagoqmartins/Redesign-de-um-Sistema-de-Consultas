@@ -1,0 +1,70 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executar Programa</title>
+    <script>
+        // Função para enviar uma requisição ao servidor Python
+        function executarPrograma() {
+            fetch('http://127.0.0.1:5000/executar', { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // alert(data.mensagem);
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Ocorreu um erro ao executar o programa.');
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Executar Programa VB6</h1>
+    <button onclick="executarPrograma()">Executar</button>
+</body>
+
+</html>-->
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executar Script Python via JS</title>
+</head>
+<body>
+    <h1>Executar Script Python</h1>
+    <button onclick="executarPython()">Executar</button>
+    <p id="status"></p> <!-- Local onde será exibida a mensagem -->
+
+    <script>
+        function executarPython() {
+            document.getElementById("status").textContent = "Executando..."; // Mensagem inicial
+            
+            fetch('http://localhost:3000/executar-python')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro na resposta do servidor.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.mensagem); // Exibe alerta com a resposta do servidor
+                    document.getElementById("status").textContent = "✅ Concluído!"; // Atualiza o texto no HTML
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    document.getElementById("status").textContent = "❌ Erro ao executar!";
+                });
+        }
+    </script>
+</body>
+</html>

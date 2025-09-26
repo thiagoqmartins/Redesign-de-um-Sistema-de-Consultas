@@ -1,0 +1,210 @@
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+.frameForm {
+  display: block;
+  align-items: center;
+}
+
+.login-container {
+  background-color: white;
+  border-radius: 10px;
+  padding: 40px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.438);
+  text-align: center;
+  width: 350px;
+  margin: auto;
+  margin-top: calc(var(--relacao)* 10%);
+}
+
+.login-container h2 {
+  color: #00579D;
+  margin-bottom: 20px;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.login-container button:not(.botao-toggle) {
+  background-color: #00579D;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  transition: background-color 0.3s ease;
+  margin-bottom: 2vh;
+}
+
+.login-container button:not(.botao-toggle):hover {
+  background-color: #298cee;
+}
+
+
+/* .login-container button:hover {
+  background-color: #298cee;
+} */
+
+p {
+  font-size: 15px;
+}
+
+/* Fundo escuro por trás do formulário */
+#registroOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+#registroOverlay.mostrar {
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Formulário */
+#registroForm {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  width: 350px;
+  text-align: center;
+  position: relative;
+  /* ESSENCIAL para o botão ser posicionado dentro */
+}
+
+/* Botão "x" fora do formulário */
+#fecharDiv {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #007BFF;
+  border: none;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  z-index: 10;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  text-align: center;
+  line-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+#fecharDiv:hover {
+  background-color: #00579D;
+  color: white;
+}
+
+
+#registroForm h2 {
+  color: #00579D;
+  margin-bottom: 20px;
+}
+
+#exibirMensagem {
+  display: none;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  animation: fadeIn 0.3s ease-in;
+  text-align: center;
+  font-weight: bold;
+  font-size: 2vh;
+}
+
+.okMensagem {
+  background-color: #d4edda;
+  border: 1px solid #28a745;
+  color: #155724;
+}
+
+.erroMensagem {
+  background-color: #ffe0e0;
+  border: 1px solid red;
+  color: #b30000;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.campo-senha {
+  position: relative;
+  width: 100%;
+}
+
+.campo-senha input[type="password"],
+.campo-senha input[type="text"] {
+  width: 100%;
+  padding-right: 40px;
+  /* espaço reservado para o botão 👁️ */
+  height: 40px;
+  /* altura consistente */
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.botao-toggle {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0;
+  color: #333333c5;
+  display: inline;
+  text-align: right;
+  width: auto;
+  /* Ajuste aqui para evitar deformações */
+}
+
+.botao-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  /* padding: 2px; */
+  /* font-size: 24px; */
+  padding-bottom: 2.5%;
+}
+
+.botao-toggle:hover {
+  background: none;
+  color: #000;
+}
