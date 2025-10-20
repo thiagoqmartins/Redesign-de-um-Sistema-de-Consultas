@@ -215,6 +215,9 @@ function carregarTabela() {
     let contador = 0;
     let ordemAntes = [];
 
+    // 1. Captura o filtro selecionado
+    const filtroSelecionado = document.querySelector('input[name="opcao2"]:checked')?.value || 'em_execucao';
+
     fetch('/dados')
         .then(response => response.json())
         .then(data => {
@@ -222,105 +225,138 @@ function carregarTabela() {
             tbody.innerHTML = '';
 
             data.forEach(item => {
-                // contador++;
-                let bu = item.class_BU
+                let bu = item.class_BU;
                 if (!bu) {
                     contador++;
-                } else {
+                    return; // pula para o próximo item
+                }
 
-                    const row = document.createElement('tr');
-                    row.setAttribute('data-numero-nota', item.numero_nota);
+                // 2. Aplica o filtro baseado no status
+                const status = item.status?.toUpperCase(); // normaliza para maiúsculas
+                console.log(status)
+                // Define se o item deve ser exibido
+                let exibir = false;
 
+                if (filtroSelecionado === 'todas') {
+                    exibir = true;
+                } else if (filtroSelecionado === 'em_execucao') {
+                    // Em execução: MEDL ou WORK
+                    exibir = (status === 'MEDL WORK');
+                } else if (filtroSelecionado === 'concluidas') {
+                    // Concluídas: status = 'CONCLUÍDO' (ou variações)
+                    exibir = (status === 'CONCLUÍDO' || status === 'CONCLUIDO');
+                }
 
-                    if (usuarioPodeArrastar) {
-                        row.setAttribute('draggable', true);
-                    }
+                // Se não deve exibir, pula
+                if (!exibir) {
+                    return;
+                }
 
-                    row.innerHTML = `
-                    <td>${item.seq_exec}</td>
-                    <td>${item.tipo_nota}</td>
-                    <td>${item.numero_nota}</td>
-                    <td>${item.nome_lista}</td>
-                    <td>${item.descricao}</td>
-                    <td>${item.notificador}</td>
+                // 3. Renderiza a linha (código original)
+                const row = document.createElement('tr');
+                row.setAttribute('data-numero-nota', item.numero_nota);
+
+                if (usuarioPodeArrastar) {
+                    row.setAttribute('draggable', true);
+                }
+
+                row.innerHTML = `                    
+                    <td>${item.tipo_nota ?? ''}</td>
+                    <td>${item.numero_nota ?? ''}</td>
+                    <td class="copy-only" id="num-claim">${item.num_claimzz ?? 'Em criação'}</td>
+                    <td>${item.nome_lista ?? ''}</td>
+                    <td>${item.descricao ?? ''}</td>
+                    <td>${item.notificador ?? ''}</td>
                     <td>${item.data_criacao ? item.data_criacao.replace(/\./g, "/") : ''}</td>
                 `;
 
-                    // document.getElementById('teste').textContent = contador;
+                // Clique para abrir detalhes (código original mantido)
+                row.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const div = document.getElementById('minhaDiv');
+                    const conteudo = document.getElementById('conteudoDiv');
 
-                    // Clique para abrir detalhes
-                    row.addEventListener('click', (event) => {
-                        event.stopPropagation();
-                        const div = document.getElementById('minhaDiv');
-                        const conteudo = document.getElementById('conteudoDiv');
+                    div.style.display = 'none';
+                    div.style.height = 'auto';
+                    setTimeout(() => {
+                        let porcentagem = 0;
 
-                        div.style.display = 'none';
-                        div.style.height = 'auto';
-                        setTimeout(() => {
-                            let porcentagem = item["numero_ordem"];
-                            if (porcentagem > 100) porcentagem = 100;
+                        if (item["num_claimzz"] != null) {
+                            const qtdMed = Number(item["qtdMedida"] ?? 0);
+                            const qtdFinal = Number(item["qtdFinalizada"] ?? 0);
 
-                            conteudo.innerHTML = `
-                            <strong style="font-size: 14px">Nota:</strong> <span style="font-size: 12px">${item.numero_nota}</span><br>
-                            <strong style="font-size: 14px">Cliente:</strong> <span style="font-size: 12px">${item.cliente}</span><br>
-                            <strong style="font-size: 14px">Descrição:</strong> <span style="font-size: 12px">${item.descricao}</span><br>
-                            <strong style="font-size: 14px">Notificador:</strong> <span style="font-size: 12px">${item.notificador}</span><br>
-                            <span style="font-size: 12px;"> ${item.content}</span>                        
-                            <label>Progresso:</label>
-                            <div class="barra-container">
-                                <div class="barra-progresso" style="width: ${porcentagem}%;">${porcentagem}%</div>
-                            </div>
-                        `;
-                            document.documentElement.style.setProperty('--largura-barra', porcentagem);
-                            div.style.display = 'block';
-                        }, 100);
+                            if (qtdMed > 0) {
+                                porcentagem = (qtdFinal / qtdMed) * 100;
+                            } else {
+                                porcentagem = 0;
+                            }
+                        }
+
+                        if (!Number.isFinite(porcentagem) || porcentagem < 0) porcentagem = 0;
+                        if (porcentagem > 100) porcentagem = 100;
+
+                        const porcentagemTexto = Math.round(porcentagem);
+
+                        conteudo.innerHTML = `
+    <strong style="font-size: 14px">Nota:</strong> <span style="font-size: 12px">${item.numero_nota ?? ''}</span><br>
+    <strong style="font-size: 14px">Cliente:</strong> <span style="font-size: 12px">${item.cliente ?? ''}</span><br>
+    <strong style="font-size: 14px">Descrição:</strong> <span style="font-size: 12px">${item.descricao ?? ''}</span><br>
+    <strong style="font-size: 14px">Notificador:</strong> <span style="font-size: 12px">${item.notificador ?? ''}</span><br>
+    <span style="font-size: 12px;">${item.content ?? ''}</span><br><br>
+    <label class="no-select">Progresso Claim Interna: <span class="copy-only" id="num-claim">${item.num_claimzz ?? 'Em Criação'}</span></label>
+    <div class="barra-container">
+      <div class="barra-progresso" style="width: ${porcentagem}%;"></div>
+    </div>
+    ${porcentagem === 0 ? '' : `<div class="texto-porcentagem">${porcentagemTexto}%</div>`}
+  `;
+
+                        document.documentElement.style.setProperty('--largura-barra', `${porcentagem}`);
+                        div.style.display = 'block';
+                    }, 100);
+                });
+
+                if (usuarioPodeArrastar) {
+                    // Eventos de arrastar (código original mantido)
+                    row.addEventListener('dragstart', () => {
+                        row.classList.add('dragging');
+                        ordemAntes = Array.from(document.querySelectorAll('#tabela-body tr')).map(linha => ({
+                            numero_nota: linha.getAttribute('data-numero-nota')
+                        }));
                     });
 
-                    if (usuarioPodeArrastar) {
-                        // Eventos de arrastar
-                        row.addEventListener('dragstart', () => {
-                            row.classList.add('dragging');
+                    row.addEventListener('dragend', () => {
+                        row.classList.remove('dragging');
+                        atualizarOrdemNoServidor();
+                    });
 
-                            // Captura a ordem ANTES de arrastar
-                            ordemAntes = Array.from(document.querySelectorAll('#tabela-body tr')).map(linha => ({
-                                numero_nota: linha.getAttribute('data-numero-nota')
-                            }));
-                        });
-
-                        row.addEventListener('dragend', () => {
-                            row.classList.remove('dragging');
-                            atualizarOrdemNoServidor();
-                        });
-
-                        row.addEventListener('dragover', (e) => {
-                            e.preventDefault();
-                            const draggingRow = document.querySelector('.dragging');
-                            const afterElement = getDragAfterElement(tbody, e.clientY);
-                            if (afterElement == null) {
-                                tbody.appendChild(draggingRow);
-                            } else {
-                                tbody.insertBefore(draggingRow, afterElement);
-                            }
-                        });
-                    }
-
-                    tbody.appendChild(row);
+                    row.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        const draggingRow = document.querySelector('.dragging');
+                        const afterElement = getDragAfterElement(tbody, e.clientY);
+                        if (afterElement == null) {
+                            tbody.appendChild(draggingRow);
+                        } else {
+                            tbody.insertBefore(draggingRow, afterElement);
+                        }
+                    });
                 }
+
+                tbody.appendChild(row);
             });
+
             const nTotal = document.getElementById('nTotal');
             if (contador > 0) {
                 nTotal.style.display = '';
-                nTotal.innerHTML = ` ${contador}`
+                nTotal.innerHTML = ` ${contador}`;
             } else {
                 nTotal.style.display = 'none';
             }
-
         })
-
         .catch(error => {
             console.error('Erro ao carregar os dados:', error);
         });
 
+    // Funções auxiliares (código original mantido)
     function getDragAfterElement(container, y) {
         const rows = [...container.querySelectorAll('tr:not(.dragging)')];
         return rows.reduce((closest, child) => {
@@ -333,6 +369,7 @@ function carregarTabela() {
             }
         }, { offset: Number.NEGATIVE_INFINITY }).element;
     }
+
     function atualizarOrdemNoServidor() {
         const linhas = document.querySelectorAll('#tabela-body tr');
         const novaOrdem = [];
@@ -346,19 +383,10 @@ function carregarTabela() {
             });
         });
 
-        // Gera resumo das mudanças comparando "antes" e "depois"
         const mudancas = novaOrdem.map((nova, index) => {
             const antes = ordemAntes.find(item => item.numero_nota === nova.numero_nota);
             const posicaoAntiga = ordemAntes.findIndex(item => item.numero_nota === nova.numero_nota) + 1;
             const posicaoNova = index + 1;
-
-            //     if (posicaoAntiga !== posicaoNova) {
-            //         return `${nova.numero_nota} - ${nova.cliente} | Para ${posicaoNova}`;
-            //         // return `${nova.numero_nota} - ${nova.cliente}: De ${posicaoAntiga} Para ${posicaoNova}`;
-            //     } else {
-            //         return null; // posição não mudou
-            //     }
-            // }).filter(m => m !== null);
 
             if (posicaoAntiga !== posicaoNova) {
                 return {
@@ -371,19 +399,14 @@ function carregarTabela() {
                 return null;
             }
         }).filter(m => m !== null);
-        // Se não houve mudanças reais, não faz nada
+
         if (mudancas.length === 0) {
             Swal.fire('Sem mudanças', 'A ordem das notas não foi alterada.', 'info');
             return;
         }
 
-        // Diálogo com visual das mudanças
         Swal.fire({
             title: 'Confirmar alteração de ordem?',
-            // html: `<div style="text-align:left;max-height:200px;overflow:auto; font-size: 1rem;">
-            //     <strong>As seguintes alterações serão feitas:</strong><br><br>
-            //     ${mudancas.map(m => `${m}`).join('<br>')}
-            //    </div>`,
             html: `<div style="text-align:left; max-height:200px; font-size: 1rem;">
                 <strong>As seguintes alterações serão feitas:</strong><br><br>
                 <span style="font-weight: bold; color: #333;">Total de mudanças: ${mudancas.length}</span><br><br> 
@@ -414,9 +437,6 @@ function carregarTabela() {
             cancelButtonText: 'Cancelar',
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            // customClass: {
-            //     icon: 'icone-tamanho',
-            // }
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch('/atualizar-ordem', {
@@ -439,11 +459,288 @@ function carregarTabela() {
                         Swal.fire('Erro', 'Não foi possível atualizar a ordem.', 'error');
                     });
             } else {
-                carregarTabela(); // Reverte visualmente
+                carregarTabela();
             }
         });
     }
 }
+
+// 4. Adiciona listeners aos radios para recarregar ao mudar
+document.addEventListener('DOMContentLoaded', () => {
+    const radios = document.querySelectorAll('input[name="opcao2"]');
+    radios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            document.getElementById('campoBusca').value = '';
+            carregarTabela(); // recarrega a tabela com o novo filtro
+        });
+    });
+
+    // Carrega a tabela pela primeira vez
+    carregarTabela();
+});
+
+
+
+// function carregarTabela() {
+//     let contador = 0;
+//     let ordemAntes = [];
+
+//     const filtroSelecionado = document.querySelector('input[name="opcao2"]:checked')?.value || 'em_execucao';
+
+//     fetch('/dados')
+//         .then(response => response.json())
+//         .then(data => {
+//             const tbody = document.getElementById('tabela-body');
+//             tbody.innerHTML = '';
+
+//             data.forEach(item => {
+//                 // contador++;
+//                 let bu = item.class_BU
+//                 let status = item.status
+//                 if (!bu) {
+//                     contador++;
+//                 } else {
+
+
+//                     const row = document.createElement('tr');
+//                     row.setAttribute('data-numero-nota', item.numero_nota);
+
+
+//                     if (usuarioPodeArrastar) {
+//                         row.setAttribute('draggable', true);
+//                     }
+
+//                     row.innerHTML = `                    
+//                     <td>${item.tipo_nota ?? ''}</td>
+//                     <td>${item.numero_nota ?? ''}</td>
+//                     <td class="copy-only" id="num-claim">${item.num_claimzz ?? 'Em criação'}</td>
+//                     <td>${item.nome_lista ?? ''}</td>
+//                     <td>${item.descricao ?? ''}</td>
+//                     <td>${item.notificador ?? ''}</td>
+//                     <td>${item.data_criacao ? item.data_criacao.replace(/\./g, "/") : ''}</td>
+//                 `;
+
+//                     // document.getElementById('teste').textContent = contador;
+
+//                     // Clique para abrir detalhes
+//                     row.addEventListener('click', (event) => {
+//                         event.stopPropagation();
+//                         const div = document.getElementById('minhaDiv');
+//                         const conteudo = document.getElementById('conteudoDiv');
+
+//                         div.style.display = 'none';
+//                         div.style.height = 'auto';
+//                         setTimeout(() => {
+//                             // calcula a porcentagem em 0–100, com fallback para 0
+//                             let porcentagem = 0;
+
+//                             if (item["num_claimzz"] != null) { // diferente de null e undefined
+//                                 const qtdMed = Number(item["qtdMedida"] ?? 0);
+//                                 const qtdFinal = Number(item["qtdFinalizada"] ?? 0);
+
+//                                 if (qtdMed > 0) {
+//                                     porcentagem = (qtdFinal / qtdMed) * 100;
+//                                 } else {
+//                                     porcentagem = 0;
+//                                 }
+//                             }
+
+//                             // limita entre 0 e 100
+//                             if (!Number.isFinite(porcentagem) || porcentagem < 0) porcentagem = 0;
+//                             if (porcentagem > 100) porcentagem = 100;
+
+
+//                             // opcional: arredondar para inteiro (ou use toFixed(1) se quiser 1 casa)
+//                             const porcentagemTexto = Math.round(porcentagem);
+
+//                             conteudo.innerHTML = `
+//     <strong style="font-size: 14px">Nota:</strong> <span style="font-size: 12px">${item.numero_nota ?? ''}</span><br>
+//     <strong style="font-size: 14px">Cliente:</strong> <span style="font-size: 12px">${item.cliente ?? ''}</span><br>
+//     <strong style="font-size: 14px">Descrição:</strong> <span style="font-size: 12px">${item.descricao ?? ''}</span><br>
+//     <strong style="font-size: 14px">Notificador:</strong> <span style="font-size: 12px">${item.notificador ?? ''}</span><br>
+//     <span style="font-size: 12px;">${item.content ?? ''}</span><br><br>
+//     <label class="no-select">Progresso Claim Interna: <span class="copy-only" id="num-claim">${item.num_claimzz ?? 'Em Criação'}</span></label>
+//     <div class="barra-container">
+//       <div class="barra-progresso" style="width: ${porcentagem}%;"></div>
+//     </div>
+//     ${porcentagem === 0 ? '' : `<div class="texto-porcentagem">${porcentagemTexto}%</div>`}
+//   `;
+
+//                             // Se sua variável CSS espera um valor com %, inclua o sufixo:
+//                             document.documentElement.style.setProperty('--largura-barra', `${porcentagem}`);
+
+//                             div.style.display = 'block';
+//                         }, 100);
+//                     });
+
+//                     if (usuarioPodeArrastar) {
+//                         // Eventos de arrastar
+//                         row.addEventListener('dragstart', () => {
+//                             row.classList.add('dragging');
+
+//                             // Captura a ordem ANTES de arrastar
+//                             ordemAntes = Array.from(document.querySelectorAll('#tabela-body tr')).map(linha => ({
+//                                 numero_nota: linha.getAttribute('data-numero-nota')
+//                             }));
+//                         });
+
+//                         row.addEventListener('dragend', () => {
+//                             row.classList.remove('dragging');
+//                             atualizarOrdemNoServidor();
+//                         });
+
+//                         row.addEventListener('dragover', (e) => {
+//                             e.preventDefault();
+//                             const draggingRow = document.querySelector('.dragging');
+//                             const afterElement = getDragAfterElement(tbody, e.clientY);
+//                             if (afterElement == null) {
+//                                 tbody.appendChild(draggingRow);
+//                             } else {
+//                                 tbody.insertBefore(draggingRow, afterElement);
+//                             }
+//                         });
+//                     }
+
+//                     tbody.appendChild(row);
+//                 }
+//             });
+//             const nTotal = document.getElementById('nTotal');
+//             if (contador > 0) {
+//                 nTotal.style.display = '';
+//                 nTotal.innerHTML = ` ${contador}`
+//             } else {
+//                 nTotal.style.display = 'none';
+//             }
+
+//         })
+
+//         .catch(error => {
+//             console.error('Erro ao carregar os dados:', error);
+//         });
+
+//     function getDragAfterElement(container, y) {
+//         const rows = [...container.querySelectorAll('tr:not(.dragging)')];
+//         return rows.reduce((closest, child) => {
+//             const box = child.getBoundingClientRect();
+//             const offset = y - box.top - box.height / 2;
+//             if (offset < 0 && offset > closest.offset) {
+//                 return { offset: offset, element: child };
+//             } else {
+//                 return closest;
+//             }
+//         }, { offset: Number.NEGATIVE_INFINITY }).element;
+//     }
+//     function atualizarOrdemNoServidor() {
+//         const linhas = document.querySelectorAll('#tabela-body tr');
+//         const novaOrdem = [];
+
+//         linhas.forEach((linha, index) => {
+//             const numeroNota = linha.getAttribute('data-numero-nota');
+//             novaOrdem.push({
+//                 numero_nota: numeroNota,
+//                 cliente: linha.cells[3].textContent,
+//                 nova_seq_exec: index + 1
+//             });
+//         });
+
+//         // Gera resumo das mudanças comparando "antes" e "depois"
+//         const mudancas = novaOrdem.map((nova, index) => {
+//             const antes = ordemAntes.find(item => item.numero_nota === nova.numero_nota);
+//             const posicaoAntiga = ordemAntes.findIndex(item => item.numero_nota === nova.numero_nota) + 1;
+//             const posicaoNova = index + 1;
+
+//             //     if (posicaoAntiga !== posicaoNova) {
+//             //         return `${nova.numero_nota} - ${nova.cliente} | Para ${posicaoNova}`;
+//             //         // return `${nova.numero_nota} - ${nova.cliente}: De ${posicaoAntiga} Para ${posicaoNova}`;
+//             //     } else {
+//             //         return null; // posição não mudou
+//             //     }
+//             // }).filter(m => m !== null);
+
+//             if (posicaoAntiga !== posicaoNova) {
+//                 return {
+//                     numero_nota: nova.numero_nota,
+//                     cliente: nova.cliente,
+//                     anterior: posicaoAntiga,
+//                     novo: posicaoNova
+//                 };
+//             } else {
+//                 return null;
+//             }
+//         }).filter(m => m !== null);
+//         // Se não houve mudanças reais, não faz nada
+//         if (mudancas.length === 0) {
+//             Swal.fire('Sem mudanças', 'A ordem das notas não foi alterada.', 'info');
+//             return;
+//         }
+
+//         // Diálogo com visual das mudanças
+//         Swal.fire({
+//             title: 'Confirmar alteração de ordem?',
+//             // html: `<div style="text-align:left;max-height:200px;overflow:auto; font-size: 1rem;">
+//             //     <strong>As seguintes alterações serão feitas:</strong><br><br>
+//             //     ${mudancas.map(m => `${m}`).join('<br>')}
+//             //    </div>`,
+//             html: `<div style="text-align:left; max-height:200px; font-size: 1rem;">
+//                 <strong>As seguintes alterações serão feitas:</strong><br><br>
+//                 <span style="font-weight: bold; color: #333;">Total de mudanças: ${mudancas.length}</span><br><br> 
+//                 <div style ="overflow:auto;">               
+//                 <table style="width:100%; border-collapse: collapse;">
+//                     <thead>
+//                         <tr>
+//                             <th style="text-align:left; border-bottom: 1px solid #ccc; padding: 4px; font-size: 0.9rem;">Claim</th>
+//                             <th style="text-align:left; border-bottom: 1px solid #ccc; padding: 4px; font-size: 0.9rem;">Cliente</th>
+//                             <th style="text-align:left; border-bottom: 1px solid #ccc; padding: 4px; font-size: 0.9rem;">Nova Posição</th>                            
+//                         </tr>
+//                     </thead>
+//                     <tbody>
+//                         ${mudancas.map(m => `
+//                             <tr>
+//                                 <td style="padding: 4px; border-bottom: 1px solid #eee; font-size: 0.8rem;">${m.numero_nota}</td>
+//                                 <td style="padding: 4px; border-bottom: 1px solid #eee; text-align:left; font-size: 0.8rem;">${m.cliente}</td>
+//                                 <td style="padding: 4px; border-bottom: 1px solid #eee; font-size: 0.8rem;">${m.novo}</td>
+//                             </tr>
+//                         `).join('')}
+//                     </tbody>
+//                 </table>
+//                 <div>
+//             </div>`,
+//             icon: 'question',
+//             showCancelButton: true,
+//             confirmButtonText: 'Sim, atualizar',
+//             cancelButtonText: 'Cancelar',
+//             confirmButtonColor: '#3085d6',
+//             cancelButtonColor: '#d33',
+//             // customClass: {
+//             //     icon: 'icone-tamanho',
+//             // }
+//         }).then((result) => {
+//             if (result.isConfirmed) {
+//                 fetch('/atualizar-ordem', {
+//                     method: 'POST',
+//                     headers: {
+//                         'Content-Type': 'application/json'
+//                     },
+//                     body: JSON.stringify({
+//                         antes: ordemAntes,
+//                         depois: novaOrdem
+//                     })
+//                 })
+//                     .then(res => res.json())
+//                     .then(json => {
+//                         Swal.fire('Sucesso!', 'A ordem foi atualizada.', 'success');
+//                         carregarTabela();
+//                     })
+//                     .catch(err => {
+//                         console.error('Erro ao atualizar ordem:', err);
+//                         Swal.fire('Erro', 'Não foi possível atualizar a ordem.', 'error');
+//                     });
+//             } else {
+//                 carregarTabela(); // Reverte visualmente
+//             }
+//         });
+//     }
+// }
 
 
 function novosUsuario() {
@@ -735,21 +1032,6 @@ function chamarAtualizar() {
         .catch(err => console.error('Erro:', err));
 }
 
-function criarZZ() {
-    console.log("Criando ZZ...");
-    fetch('/criarZZ', {
-        method: 'POST'
-    })
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            // alert('Atualizado com sucesso!');
-            // location.reload(); // Atualiza a página atual
-
-        })
-        .catch(err => console.error('Erro:', err));
-}
-
 async function carregarNoticias() {
     try {
         const resposta = await fetch('/noticias.json');
@@ -767,6 +1049,7 @@ async function carregarNoticias() {
     `).join('');
 
         noticiasBanner.innerHTML = conteudo + conteudo; // duplicar para scroll contínuo
+        // noticiasBanner.innerHTML = "Leandro de um aumento para o eduardo"; // duplicar para scroll contínuo
 
         requestAnimationFrame(() => {
             const larguraTotal = noticiasBanner.scrollWidth / 2;

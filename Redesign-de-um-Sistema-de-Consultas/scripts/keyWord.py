@@ -1,7 +1,7 @@
 import json
 
 def palavraChave():
-    return ['"WEG"', '"TURBINA"']
+    return ['"WEG"', '"SIEMENS"', '"SEW"', '"METSO"', '"PETROBRAS"', '"SULCROALCOOLEIRO"', '"PAPEL E CELULOSE"',  '"MINERAÇÃO"']
     # return [""]
 
 if __name__ == "__main__":

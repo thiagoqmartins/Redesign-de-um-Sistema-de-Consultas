@@ -1,12 +1,10 @@
-<!-- <!DOCTYPE html> -->
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Consultas Claims - WEN-SZO</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
-        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Gestão de Consultas Claims</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/admin.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -20,9 +18,10 @@
         <div class="cont">
             <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
                 onclick="window.location.href='/'">
+            <!-- <img src="./images/MODELO_LOGO.jpg" alt="Logo" class="logo" onclick="window.location.href='/'"> -->
         </div>
         <div class="cont2">
-            <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+            <h1>Gestão de Consultas Claims</h1>
         </div>
         <div class="cont3">
             <div class="tooltip">
@@ -33,68 +32,83 @@
             </div>
         </div>
     </div>
+    <div class="body_geral">
+        <div class="secao-adicionar">
+            <div class="cotainer_1">
+                <div class="bloco-titulo">
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light ">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#conteudoNavbarSuportado"
-            aria-controls="conteudoNavbarSuportado" aria-expanded="false" aria-label="Alterna navegação">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+                    <h3>Adicionar Usuário</h3>
+                    <form id="form-adicionar-resp">
+                        <div class="linha-form">
+                            <input type="text" id="novo-nome" name="nome_resp" placeholder="Nome do usuário" required>
+                            <div class="acoes-form">
+                                <button type="submit" class="btn-salvar" id="btn-add-usuario">Adicionar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-        <div class="collapse navbar-collapse" id="conteudoNavbarSuportado">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle nav-texto" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Menu
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#">Atividades</a>
-                        <a class="dropdown-item" href="#">Colaboradores</a>
-                        <a class="dropdown-item" href="#">Unidade Negócio</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
-    <div class="dados_tabela">
-        <div class="cont_tabela">
-            <div class="tabela-container">
-                <table class="tabela">
-                    <thead class="scrollable-content">
-                        <tr>
-                            <th>Seq.</th>
-                            <th>Tipo</th>
-                            <th>Número Nota</th>
-                            <th>Cliente</th>
-                            <th>Descrição</th>
-                            <th>Solicitante</th>
-                            <th>Data Criação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-body">
-                        <!-- Linhas serão geradas via JavaScript -->
-                    </tbody>
-                </table>
+                <span class="divisor-vertical" aria-hidden="true"></span>
+
+
+                <div class="bloco-ausencia">
+                    <select id="usuario-ausencia" class="combo-usuario" required>
+                        <option value="">Selecione um usuário...</option>
+                    </select>
+                    <input type="date" id="ausencia-inicio" aria-label="Início da ausência" required>
+                    <input type="date" id="ausencia-fim" aria-label="Fim da ausência" required>
+                    <button type="button" class="btn-salvar" id="btn-definir-ausencia">Definir ausência</button>
+                    <button type="button" class="btn-salvar" id="btn-redefinir-ausencia">Redefinir</button>
+                </div>
             </div>
+            <div class="dados_tabela">
+                <div class="cont_tabela">
+                    <div class="tabela-container">
+                        <table class="tabela">
+                            <thead class="scrollable-content">
+                                <tr id="cabecalho">
+                                    <th>Usuário</th>
+                                    <th data-campo="resp_ativo">Ativo</th>
+                                    <th data-campo="Turbinas">Turbinas</th>
+                                    <th data-campo="Redutores">Redutores</th>
+                                    <th data-campo="Novos">Novos</th>
+                                    <th data-campo="Servicos">Serviços</th>
+                                    <th data-campo="Calculos">Cálculos</th>
+                                    <th data-campo="Estudos">Estudos</th>
+                                    <th data-campo="Seg_Controle">Seg. Controle</th>
+                                    <th data-campo="Documentos">Documentos</th>
+                                    <th data-campo="Acessorios">Acessórios</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabela-body">
+                                <!-- Linhas serão geradas via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+            </div>
+            <div id="toast" class="toast"></div>
+            <!-- Modal de confirmação -->
+            <dialog id="confirm-dialog">
+                <form method="dialog" class="dialog-body">
+                    <h4 id="confirm-title">Confirmar ação</h4>
+                    <p id="confirm-message">Tem certeza?</p>
+                    <div class="dialog-actions">
+                        <button value="cancel" class="btn-cancelar">Cancelar</button>
+                        <button value="ok" class="btn-confirmar">Confirmar</button>
+                    </div>
+                </form>
+            </dialog>
         </div>
-
-
-    </div>
-    <footer id="footer">
-    </footer>
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
-    <script src="./js/admin.js"></script> <!-- Importando o JavaScript externo -->
-    <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <footer id="footer">
+        </footer>
+        <script src="./js/admin.js"></script> <!-- Importando o JavaScript externo -->
+        <script src="./js/styles.js"></script> <!-- Importando o JavaScript externo -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 

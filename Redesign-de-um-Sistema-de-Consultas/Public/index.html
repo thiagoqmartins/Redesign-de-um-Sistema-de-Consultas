@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Consultas Claims - WEN-SZO</title>
+    <title>Gestão de Consultas Claims</title>
     <link rel="stylesheet" href="./css/styles.css">
     <link rel="stylesheet" href="./css/index.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -18,9 +18,10 @@
         <div class="cont">
             <img src="images/WEG_logomarca_P_P_PEQUENA_aZUL.png" alt="Logo WEG" class="logo"
                 onclick="window.location.href='/'">
+            <!-- <img src="./images/MODELO_LOGO.jpg" alt="Logo" class="logo" onclick="window.location.href='/'"> -->
         </div>
         <div class="cont2">
-            <h1>Gestão de Consultas Claims - WEN/SZO</h1>
+            <h1>Gestão de Consultas Claims</h1>
         </div>
         <div class="cont3">
             <div class="tooltip">
@@ -46,14 +47,14 @@
                 <input type="text" id="campoBusca" placeholder="Pesquisar..." class="input-busca" />
             </div>
             <div class="options">
-                <div class="optionsLine">
+                <!-- <div class="optionsLine">
                     <label><input type="radio" name="opcao1"> Turbinas </label>
                     <label><input type="radio" name="opcao1"> Redutores </label>
-                </div>
+                </div> -->
                 <div class="optionsBU">
-                    <label><input type="radio" name="opcao2"> Equipamentos Novos</label>
-                    <label><input type="radio" name="opcao2"> Serviços</label>
-                    <label><input type="radio" name="opcao2"> Gestão de Projetos</label>
+                    <label><input type="radio" name="opcao2" value="todas"> Todas</label>
+                    <label><input type="radio" name="opcao2" value="em_execucao" checked> Em Execução</label>
+                    <label><input type="radio" name="opcao2" value="concluidas"> Concluídas</label>
                 </div>
             </div>
         </div>
@@ -63,9 +64,10 @@
                     <table class="tabela">
                         <thead class="scrollable-content">
                             <tr>
-                                <th>Seq.</th>
+                                <!-- <th>Seq.</th> -->
                                 <th>Tipo</th>
-                                <th>Número Nota</th>
+                                <th>Número Claim</th>
+                                <th>Claim "Interna"</th>
                                 <th>Cliente</th>
                                 <th>Descrição</th>
                                 <th>Solicitante</th>

@@ -49,8 +49,10 @@ sys.stdout.reconfigure(encoding='utf-8')
 #AT-R      → 4 (Cálculo Redutor > Segurança e Controle > Estudos > Partes e Peças)
 
 
-# Processo de validação ?????
 
+
+
+# Processo de validação ?????
 
     
 def dados_claim(nclaim): 
@@ -68,29 +70,3 @@ def dados_claim(nclaim):
   
     return descricaoClaim
     
-
-#     TextoSintese = limpar_texto_para_json(TextoSintese)
-#     # print (TextoSintese)
-#     return str(TextoSintese)
-
-# def limpar_texto_para_json(texto: str) -> str:
-#     # Remove caracteres de controle como \n, \r, \t (mas mantém espaço simples)
-#     texto = texto.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ')
-
-#     # Remove tudo entre "Conteúdo" e ".."
-#     texto = re.sub(r'Conteúdo.*?\.\.', '', texto, flags=re.DOTALL)
-
-#     # Remove tudo entre "Status" e ".."
-#     texto = re.sub(r'Status.*?\.\.', '', texto, flags=re.DOTALL)
-
-#     # Remove espaços duplicados
-#     texto = re.sub(r'\s+', ' ', texto).strip()
-
-#     # Escapa aspas duplas
-#     texto = texto.replace('"', '\\"')
-
-#     return texto
-
-# if __name__ == "__main__":
-#     session = connectSAP.conectar()
-#     print(session.Info.User)

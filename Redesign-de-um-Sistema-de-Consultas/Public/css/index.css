@@ -230,6 +230,7 @@ tr.selected td {
     color: rgb(255, 255, 255);
 }
 
+
 .tabela-container {
     position: relative;
     /* fundamental para sticky */
@@ -274,7 +275,7 @@ tr.selected td {
     background-color: #0056b3;
     /* cor sólida para o fundo */
     color: white;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
     z-index: 10;
     /* maior que os outros elementos próximos */
@@ -449,7 +450,8 @@ tr.selected td {
     position: relative;
     height: 100%;
     width: 0%;
-    background-color: rgba(30, 61, 241, 0.986);
+    /* background-color: rgba(30, 61, 241, 0.986); */
+    background: linear-gradient(to right, #1e3df1 0%, #9BB0FF 50%, #eee 100%);
     color: white;
     font-weight: bold;
     display: inline-block;
@@ -457,6 +459,10 @@ tr.selected td {
     transition: width 0.4s ease;
     box-sizing: border-box;
     overflow: hidden;
+    /* border: 2px solid white; */
+    border-radius: 5px 2px 2px 5px;
+    /* sombra externa à direita */
+
 }
 
 .barra-progresso::before {
@@ -476,9 +482,17 @@ tr.selected td {
     animation: brilhoAndando2 calc(1s + var(--largura-barra) * 0.05s) infinite linear;
 }
 
+.texto-porcentagem {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgba(30, 61, 241, 0.986);
+    text-align: center;
+    margin-top: 5px;
+}
+
 @keyframes brilhoAndando2 {
     0% {
-        left: -10%;
+        left: -20%;
     }
 
     100% {
@@ -611,9 +625,9 @@ tr.selected td {
 
 }
 
-.optionsBU {
+/* .optionsBU {
     border-left: 0.1em solid #888;
-}
+} */
 
 .optionsLine,
 .optionsBU {
@@ -726,4 +740,18 @@ tr.selected td {
     font-weight: 600;
     pointer-events: none;
     /* evita clique acidental no contador */
+}
+
+.no-select {
+    user-select: none;
+    color: black !important;
+    /* impede selecionar o label */
+    font-size: 14px !important;
+}
+
+.copy-only {
+    user-select: text;
+    /* permite selecionar só o valor */
+    cursor: text;
+    color: rgba(247, 96, 50, 0.986);
 }

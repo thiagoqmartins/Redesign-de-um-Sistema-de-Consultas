@@ -74,8 +74,8 @@ const attrs = [{ name: 'commonName', value: '10.67.4.122' }];
 const pems = selfsigned.generate(attrs, { days: 365 });
 
 // Salva o certificado e a chave em arquivos locais
-fs.writeFileSync('certificado.crt', pems.cert); // Certificado
-fs.writeFileSync('chave.key', pems.private);   // Chave privada (opcional)
+// fs.writeFileSync('certificado.crt', pems.cert); // Certificado
+// fs.writeFileSync('chave.key', pems.private);   // Chave privada (opcional)
 
 let contador = 1;
 
@@ -480,6 +480,395 @@ app.get('/dados', (req, res) => {
     db.close();
 });
 
+app.get('/dados_responsaveis', (req, res) => {
+    // Define o caminho para o arquivo do banco de dados SQLite (ajuste conforme seu projeto)
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+
+    // Abre uma conexão somente leitura com o banco de dados
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READONLY, (err) => {
+        if (err) {
+            // Em caso de erro ao abrir o banco, loga no console e retorna erro 500
+            console.error('Erro ao abrir o banco:', err.message);
+            return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+        }
+    });
+
+    // SQL para selecionar todos os registros da tabela, ordenados pela coluna 'seq_exec' ascendente
+    const sql = `SELECT * FROM responsaveis ORDER BY nome_resp ASC`;
+
+    // Executa a consulta SQL para obter todos os dados
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            // Em caso de erro na consulta, loga e retorna erro 500
+            console.error('Erro na consulta:', err.message);
+            return res.status(500).json({ erro: 'Erro ao consultar dados.' });
+        }
+
+        // Se sucesso, retorna os dados encontrados em formato JSON
+        res.json(rows);
+    });
+
+    // Fecha a conexão com o banco de dados (importante para liberar recursos)
+    db.close();
+});
+
+app.post('/salvar-responsaveis', (req, res) => {
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+
+    console.log("🟢 Rota /salvar-responsaveis acessada");
+    console.log("Dados recebidos:", req.body);
+
+    const {
+        nome_resp,
+        seq_exec,
+        resp_ativo,
+        Turbinas,
+        Redutores,
+        Novos,
+        Servicos,
+        Calculos,
+        Estudos,
+        Seg_Controle,
+        Documentos,
+        Acessorios
+    } = req.body;
+
+    // Validação básica
+    if (!nome_resp) {
+        return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+    }
+
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error('Erro ao abrir o banco:', err.message);
+            return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+        }
+    });
+
+    const sql = `
+        UPDATE responsaveis 
+        SET resp_ativo = ?,
+            Turbinas = ?,
+            Redutores = ?,
+            Novos = ?,
+            Serviços = ?,
+            Calculos = ?,
+            Estudos = ?,
+            Seg_Controle = ?,
+            Documentos = ?,
+            Acessorios = ?
+        WHERE nome_resp = ?
+    `;
+
+    const params = [
+        resp_ativo,
+        Turbinas,
+        Redutores,
+        Novos,
+        Servicos,
+        Calculos,
+        Estudos,
+        Seg_Controle,
+        Documentos,
+        Acessorios,
+        nome_resp
+    ];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            console.error('Erro ao atualizar:', err.message);
+            db.close();
+            return res.status(500).json({ erro: 'Erro ao salvar dados.' });
+        }
+
+        console.log(`✅ Linha atualizada: ${this.changes} registro(s) afetado(s)`);
+
+        db.close((closeErr) => {
+            if (closeErr) {
+                console.error('Erro ao fechar o banco:', closeErr.message);
+            }
+        });
+
+        res.json({
+            sucesso: true,
+            mensagem: 'Dados salvos com sucesso!',
+            linhasAfetadas: this.changes
+        });
+    });
+});
+
+app.post('/add_responsavel', (req, res) => {
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+
+    let { nome_resp } = req.body || {};
+
+    if (!nome_resp || !nome_resp.trim()) {
+        return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+    }
+
+    nome_resp = nome_resp.trim().toUpperCase();
+
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error('Erro ao abrir o banco:', err.message);
+            return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+        }
+    });
+
+    const sql = `
+    INSERT INTO responsaveis
+      (nome_resp, resp_ativo, Turbinas, Redutores, Novos, "Serviços", Calculos, Estudos, Seg_Controle, Documentos, Acessorios)
+    VALUES (?, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+  `;
+
+    const params = [nome_resp.trim()];
+
+    db.run(sql, params, function (err) {
+        if (err) {
+            console.error('Erro ao inserir:', err.message);
+            // Tratativa opcional para duplicidade:
+            // if (err.code === 'SQLITE_CONSTRAINT') return res.status(409).json({ erro: 'Usuário já existe.' });
+            db.close();
+            return res.status(500).json({ erro: 'Erro ao adicionar usuário.' });
+        }
+
+        console.log(`✅ Usuário inserido (rowid ${this.lastID})`);
+
+        db.close((closeErr) => {
+            if (closeErr) console.error('Erro ao fechar o banco:', closeErr.message);
+        });
+
+        res.json({ sucesso: true, id: this.lastID });
+    });
+});
+
+app.post('/delete_responsavel', (req, res) => {
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+    const { nome_resp } = req.body || {};
+    if (!nome_resp || !nome_resp.trim()) return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+
+    const nomeUpper = nome_resp.trim().toUpperCase();
+
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error('Erro ao abrir o banco:', err.message);
+            return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+        }
+    });
+
+    const sql = `DELETE FROM responsaveis WHERE nome_resp = ?`;
+    db.run(sql, [nomeUpper], function (err) {
+        if (err) {
+            console.error('Erro ao excluir:', err.message);
+            db.close();
+            return res.status(500).json({ erro: 'Erro ao excluir usuário.' });
+        }
+        const removidos = this.changes || 0;
+        db.close();
+        if (removidos === 0) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        res.json({ sucesso: true, removidos });
+    });
+});
+
+app.post('/definir_ausencia', (req, res) => {
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+
+    console.log('🟢 Rota /definir_ausencia acessada');
+    console.log('Dados recebidos:', req.body);
+
+    // aceita ambos: inicio/fim OU inicio_aus/fim_aus
+    let {
+        nome_resp,
+        inicio,
+        fim,
+        inicio_aus,
+        fim_aus
+    } = req.body || {};
+
+    // normaliza nomes de campos
+    inicio = inicio || inicio_aus;
+    fim = fim || fim_aus;
+
+    // Validações básicas
+    if (!nome_resp || !String(nome_resp).trim()) {
+        return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+    }
+    if (!inicio || !fim) {
+        return res.status(400).json({ erro: 'inicio e fim são obrigatórios (YYYY-MM-DD).' });
+    }
+
+    // Normalização
+    nome_resp = String(nome_resp).trim().toUpperCase();
+    inicio = String(inicio).trim();
+    fim = String(fim).trim();
+
+    const reData = /^\d{4}-\d{2}-\d{2}$/;
+    if (!reData.test(inicio) || !reData.test(fim)) {
+        return res.status(400).json({ erro: 'Datas inválidas. Use o formato YYYY-MM-DD.' });
+    }
+    if (fim < inicio) {
+        return res.status(400).json({ erro: 'A data fim deve ser maior ou igual à data início.' });
+    }
+
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+        if (err) {
+            console.error('Erro ao abrir o banco:', err.message);
+            return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+        }
+    });
+
+    db.serialize(() => {
+        const sqlCheck = `SELECT 1 FROM responsaveis WHERE nome_resp = ? LIMIT 1`;
+        db.get(sqlCheck, [nome_resp], (err, row) => {
+            if (err) {
+                console.error('Erro ao verificar usuário:', err.message);
+                db.close();
+                return res.status(500).json({ erro: 'Erro ao verificar usuário.' });
+            }
+            if (!row) {
+                db.close();
+                return res.status(404).json({ erro: 'Usuário não encontrado.' });
+            }
+
+            const sqlUpdate = `
+        UPDATE responsaveis
+        SET inicio_aus = ?, fim_aus = ?
+        WHERE nome_resp = ?
+      `;
+            db.run(sqlUpdate, [inicio, fim, nome_resp], function (err) {
+                if (err) {
+                    console.error('Erro ao atualizar ausência:', err.message);
+                    db.close();
+                    return res.status(500).json({ erro: 'Erro ao salvar ausência.' });
+                }
+
+                const linhas = this.changes || 0;
+                console.log(`✅ Ausência definida para ${nome_resp}: ${inicio} a ${fim}. Registros afetados: ${linhas}`);
+
+                db.close((closeErr) => {
+                    if (closeErr) console.error('Erro ao fechar o banco:', closeErr.message);
+                });
+
+                return res.json({
+                    sucesso: true,
+                    mensagem: 'Ausência definida com sucesso.',
+                    linhasAfetadas: linhas,
+                    nome_resp,
+                    inicio,
+                    fim
+                });
+            });
+        });
+    });
+});
+
+// app.post('/definir_ausencia', (req, res) => {
+//     const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+
+//     console.log('🟢 Rota /definir_ausencia acessada');
+//     console.log('Dados recebidos:', req.body);
+
+//     let { nome_resp, inicio, fim } = req.body || {};
+
+//     // Validações básicas
+//     if (!nome_resp || !String(nome_resp).trim()) {
+//         return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+//     }
+//     if (!inicio || !fim) {
+//         return res.status(400).json({ erro: 'inicio e fim são obrigatórios (YYYY-MM-DD).' });
+//     }
+
+//     // Normalização
+//     nome_resp = String(nome_resp).trim().toUpperCase();
+//     inicio = String(inicio).trim();
+//     fim = String(fim).trim();
+
+//     // Validação de formato e ordem das datas
+//     const reData = /^\d{4}-\d{2}-\d{2}$/;
+//     if (!reData.test(inicio) || !reData.test(fim)) {
+//         return res.status(400).json({ erro: 'Datas inválidas. Use o formato YYYY-MM-DD.' });
+//     }
+//     if (fim < inicio) {
+//         return res.status(400).json({ erro: 'A data fim deve ser maior ou igual à data início.' });
+//     }
+
+//     const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE, (err) => {
+//         if (err) {
+//             console.error('Erro ao abrir o banco:', err.message);
+//             return res.status(500).json({ erro: 'Erro ao abrir o banco.' });
+//         }
+//     });
+
+//     db.serialize(() => {
+//         // 1) Confere se o usuário existe
+//         const sqlCheck = `SELECT 1 FROM responsaveis WHERE nome_resp = ? LIMIT 1`;
+//         db.get(sqlCheck, [nome_resp], (err, row) => {
+//             if (err) {
+//                 console.error('Erro ao verificar usuário:', err.message);
+//                 db.close();
+//                 return res.status(500).json({ erro: 'Erro ao verificar usuário.' });
+//             }
+//             if (!row) {
+//                 db.close();
+//                 return res.status(404).json({ erro: 'Usuário não encontrado.' });
+//             }
+
+//             // 2) Atualiza as colunas de ausência
+//             const sqlUpdate = `
+//         UPDATE responsaveis
+//         SET inicio_aus = ?, fim_aus = ?
+//         WHERE nome_resp = ?
+//       `;
+//             db.run(sqlUpdate, [inicio, fim, nome_resp], function (err) {
+//                 if (err) {
+//                     console.error('Erro ao atualizar ausência:', err.message);
+//                     db.close();
+//                     return res.status(500).json({ erro: 'Erro ao salvar ausência.' });
+//                 }
+
+//                 const linhas = this.changes || 0;
+//                 console.log(`✅ Ausência definida para ${nome_resp}: ${inicio} a ${fim}. Registros afetados: ${linhas}`);
+
+//                 db.close((closeErr) => {
+//                     if (closeErr) console.error('Erro ao fechar o banco:', closeErr.message);
+//                 });
+
+//                 return res.json({
+//                     sucesso: true,
+//                     mensagem: 'Ausência definida com sucesso.',
+//                     linhasAfetadas: linhas,
+//                     nome_resp,
+//                     inicio,
+//                     fim
+//                 });
+//             });
+//         });
+//     });
+// });
+
+app.post('/limpar_ausencia', (req, res) => {
+    const dbPath = path.join(__dirname, 'BD/banco_dados.db');
+    let { nome_resp } = req.body || {};
+    if (!nome_resp || !String(nome_resp).trim()) {
+        return res.status(400).json({ erro: 'nome_resp é obrigatório.' });
+    }
+    nome_resp = String(nome_resp).trim().toUpperCase();
+
+    const db = new sqlite3.Database(dbPath, sqlite3.OPEN_READWRITE);
+    const sql = `UPDATE responsaveis SET inicio_aus = NULL, fim_aus = NULL WHERE nome_resp = ?`;
+    db.run(sql, [nome_resp], function (err) {
+        if (err) {
+            db.close();
+            return res.status(500).json({ erro: 'Erro ao limpar ausência.' });
+        }
+        const linhas = this.changes || 0;
+        db.close();
+        if (!linhas) return res.status(404).json({ erro: 'Usuário não encontrado.' });
+        res.json({ sucesso: true, mensagem: 'Ausência removida.', linhasAfetadas: linhas });
+    });
+});
+
+
 // Middleware para permitir requisições Cross-Origin (CORS)
 app.use(cors());
 
@@ -487,7 +876,7 @@ app.use(cors());
 app.use(express.json());
 
 
-
+// Criar nova consulta ZZ
 app.post('/createZZ', (req, res) => {
     // Caminho absoluto do script
     const scriptPath = path.join(__dirname, 'scripts', 'createZZ.py');
@@ -606,54 +995,108 @@ app.post('/executar-python', (req, res) => {
 
 });
 
-// Rota POST para executar o script Python passando o valor do campo IQS9
+// // Rota POST para executar o script Python passando o valor do campo IQS9
+// app.post('/executar-python-iqs9', (req, res) => {
+
+//     // Extrai o campo 'campo' do corpo da requisição
+//     const { campo } = req.body;
+
+//     // Valida se o campo foi enviado; se não, retorna erro 400 (bad request)
+//     if (!campo) {
+//         return res.status(400).json({ mensagem: "❌ Nenhum valor numérico foi enviado!" });
+//     }
+
+//     // Monta o comando para executar o script Python com o argumento passado
+//     const comando = `python sap_script.py "${campo}"`;
+
+//     // Executa o comando no shell
+//     exec(comando, (error, stdout, stderr) => {
+//         if (error) {
+//             // Caso haja erro na execução do script, loga e retorna erro 500
+//             console.error(`❌ Erro ao executar o script Python:\n${error.message}`);
+//             // SAP GUI For Windowns 770
+//             return res.status(500).json({
+//                 mensagem: "Erro ao executar o script!",
+//                 detalhe: error.message
+//             });
+//         }
+
+//         if (stderr) {
+//             // Se o script Python enviou avisos para stderr, loga como warning
+//             console.warn(`⚠️ Aviso do script Python:\n${stderr}`);
+//         }
+
+//         try {
+//             // Tenta interpretar a saída do script Python como JSON
+//             const resultadoJson = JSON.parse(stdout.trim());
+//             // Retorna resultado com mensagem de sucesso
+//             res.json({
+//                 mensagem: "Execução concluída!",
+//                 resultado: resultadoJson
+//             });
+//         } catch (e) {
+//             // Se falhar ao interpretar o JSON, loga o campo enviado e retorna erro 500 com detalhes
+//             console.log("🟣 Campo:", campo);
+//             res.status(500).json({
+//                 mensagem: "Erro ao interpretar saída do Python",
+//                 detalhe: e.message,
+//                 retornoBruto: stdout.trim()
+//             });
+//         }
+//     });
+// });
+
 app.post('/executar-python-iqs9', (req, res) => {
+    const scriptPath = path.join(__dirname, 'transacoes', 'trans_iqs9.py');
+    const comando = `python "${scriptPath}"`;
 
-    // Extrai o campo 'campo' do corpo da requisição
-    const { campo } = req.body;
 
-    // Valida se o campo foi enviado; se não, retorna erro 400 (bad request)
-    if (!campo) {
-        return res.status(400).json({ mensagem: "❌ Nenhum valor numérico foi enviado!" });
-    }
+    const child = exec(comando, { timeout: 120000 }, (error, stdout, stderr) => {
+        // Loga TUDO para debug
+        // console.log('📤 stdout:', stdout);
+        // console.log('📤 stderr:', stderr);
 
-    // Monta o comando para executar o script Python com o argumento passado
-    const comando = `python sap_script.py "${campo}"`;
-
-    // Executa o comando no shell
-    exec(comando, (error, stdout, stderr) => {
         if (error) {
-            // Caso haja erro na execução do script, loga e retorna erro 500
-            console.error(`❌ Erro ao executar o script Python:\n${error.message}`);
-            // SAP GUI For Windowns 770
+            console.error('❌ Erro exec:', error.message);
+            console.error('❌ Exit code:', error.code);
+
+            // Tenta parsear erro JSON do stderr
+            let erroDetalhado = error.message;
+            try {
+                const errJson = JSON.parse(stderr || stdout || '{}');
+                if (errJson.traceback) {
+                    console.error('🐍 Traceback Python:\n', errJson.traceback);
+                }
+                erroDetalhado = errJson.erro || errJson.traceback || error.message;
+            } catch { }
+
             return res.status(500).json({
-                mensagem: "Erro ao executar o script!",
-                detalhe: error.message
+                ok: false,
+                etapa: 'executar-python-iqs9',
+                erro: erroDetalhado,
+                stdout: stdout,
+                stderr: stderr
             });
         }
 
-        if (stderr) {
-            // Se o script Python enviou avisos para stderr, loga como warning
-            console.warn(`⚠️ Aviso do script Python:\n${stderr}`);
-        }
-
+        // Tenta parsear JSON do stdout
+        let data = null;
         try {
-            // Tenta interpretar a saída do script Python como JSON
-            const resultadoJson = JSON.parse(stdout.trim());
-            // Retorna resultado com mensagem de sucesso
-            res.json({
-                mensagem: "Execução concluída!",
-                resultado: resultadoJson
-            });
-        } catch (e) {
-            // Se falhar ao interpretar o JSON, loga o campo enviado e retorna erro 500 com detalhes
-            console.log("🟣 Campo:", campo);
-            res.status(500).json({
-                mensagem: "Erro ao interpretar saída do Python",
-                detalhe: e.message,
-                retornoBruto: stdout.trim()
-            });
+            data = stdout && stdout.trim() ? JSON.parse(stdout.trim()) : null;
+        } catch (parseError) {
+            // console.warn('⚠️ Não foi possível parsear JSON:', parseError.message);
+            // console.warn('⚠️ stdout recebido:', stdout);
         }
+
+        return res.json({
+            ok: true,
+            etapa: 'executar-python-iqs9',
+            resultado: data ?? stdout?.trim() ?? 'executar-python-iqs9 Concluído'
+        });
+    });
+
+    child.on('error', (err) => {
+        console.error('❌ Falha no spawn/exec:', err.message);
     });
 });
 
@@ -701,82 +1144,202 @@ app.post('/updateContent', (req, res) => {
     });
 });
 
-setInterval(() => {
-    const campo = 'IQS9';
+app.post('/encerrar-claim', (req, res) => {
 
+    // Caminho absoluto do script
+    const scriptPath = path.join(__dirname, 'scripts', 'encerrar_claim.py');
 
+    // Chame o Python explicitamente (no Windows pode ser "py" ou "python")
+    const comando = `python "${scriptPath}"`;
 
-    // Verifica se o campo foi enviado;
-    if (!campo) {
-        return res.status(400).json({ mensagem: "❌ Nenhum valor numérico foi enviado!" });
-    }
+    // Timeout evita pendurar indefinidamente
+    const child = exec(comando, { timeout: 120000 }, (error, stdout, stderr) => {
+        if (error) {
+            return res.status(500).json({
+                ok: false,
+                etapa: 'encerrar-claim',
+                erro: error.message
+            });
+        }
 
-    // Comando para executar o script Python com o campo IQS9
-    const comando = `python sap_script.py "${campo}"`;
+        if (stderr && stderr.trim()) {
+            // warnings/prints do Python em stderr
+            console.warn("⚠️ /encerrar-claim: stderr:", stderr.trim());
+        }
 
-    // console.log(`🚀 Requisição enviada com campo: ${campo}`); 
+        // Se seu script imprime JSON, tente parsear; senão, devolva texto
+        let payload = stdout && stdout.trim();
+        let data = null;
+        try {
+            data = payload ? JSON.parse(payload) : null;
+        } catch (_) {
+            // se não for JSON, seguimos com texto
+        }
+        return res.json({
+            ok: true,
+            etapa: 'encerrar-claim',
+            resultado: data ?? payload ?? 'Claims Encerradas'
+        });
+    });
 
-    // exec(comando, (error, stdout, stderr) => {
-    //     if (error) {
-    //         console.error(`❌ Erro ao executar o script Python:\n${error.message}`);
-    //     }
+    // (opcional) logs quando o processo excede buffer/tempo
+    child.on('error', (err) => {
+        console.error('❌ /encerrar-claim: falha no spawn/exec:', err.message);
+    });
+});
 
-    //     if (stderr) {
+app.post('/qtdAtividades', (req, res) => {
 
-    //         console.warn(`⚠️ Aviso do script Python:\n${stderr}`);
-    //     }
-    //     console.log("✅ Script Python executado com sucesso!");
-    // });
-    // axios.post('https://10.67.4.122:3000/createZZ', {}, { httpsAgent })
-    // axios.post('https://10.67.4.122:3000/executar-python-iqs9', { campo }, { httpsAgent })  
+    // Caminho absoluto do script
+    const scriptPath = path.join(__dirname, 'scripts', 'qtd_atividade.py');
 
-    // console.log(`🚀 Requisição enviada com campo: ${campo}`);  
-    // console.log(`🔄 Contador: ${contador}`);
-    // contador++;
-}, 15000);
+    // Chame o Python explicitamente (no Windows pode ser "py" ou "python")
+    const comando = `python "${scriptPath}"`;
 
-async function executarSequencialmente() {
+    // Timeout evita pendurar indefinidamente
+    const child = exec(comando, { timeout: 120000 }, (error, stdout, stderr) => {
+        if (error) {
+            return res.status(500).json({
+                ok: false,
+                etapa: 'qtdAtividades',
+                erro: error.message
+            });
+        }
+
+        if (stderr && stderr.trim()) {
+            // warnings/prints do Python em stderr
+            console.warn("⚠️ /qtdAtividades: stderr:", stderr.trim());
+        }
+
+        // Se seu script imprime JSON, tente parsear; senão, devolva texto
+        let payload = stdout && stdout.trim();
+        let data = null;
+        try {
+            data = payload ? JSON.parse(payload) : null;
+        } catch (_) {
+            // se não for JSON, seguimos com texto
+        }
+        return res.json({
+            ok: true,
+            etapa: 'qtdAtividades',
+            resultado: data ?? payload ?? 'Atividades Atualizadas'
+        });
+    });
+
+    // (opcional) logs quando o processo excede buffer/tempo
+    child.on('error', (err) => {
+        console.error('❌ /qtdAtividades: falha no spawn/exec:', err.message);
+    });
+});
+
+// app.post('/executar-python-iqs9', (req, res) => {
+
+//     // Caminho absoluto do script
+//     const scriptPath = path.join(__dirname, 'transacoes', 'trans_iqs9.py');
+
+//     // Chame o Python explicitamente (no Windows pode ser "py" ou "python")
+//     const comando = `python "${scriptPath}"`;
+//     console.log(comando)
+
+//     // Timeout evita pendurar indefinidamente
+//     const child = exec(comando, { timeout: 120000 }, (error, stdout, stderr) => {
+//         if (error) {
+//             return res.status(500).json({
+//                 ok: false,
+//                 etapa: 'executar-python-iqs9',
+//                 erro: error.message
+//             });
+//         }
+
+//         if (stderr && stderr.trim()) {
+//             // warnings/prints do Python em stderr
+//             console.warn("⚠️ /executar-python-iqs9: stderr:", stderr.trim());
+//         }
+
+//         // Se seu script imprime JSON, tente parsear; senão, devolva texto
+//         let payload = stdout && stdout.trim();
+//         let data = null;
+//         try {
+//             data = payload ? JSON.parse(payload) : null;
+//         } catch (_) {
+//             // se não for JSON, seguimos com texto
+//         }
+//         return res.json({
+//             ok: true,
+//             etapa: 'executar-python-iqs9',
+//             resultado: data ?? payload ?? 'executar-python-iqs9 Atualizadas'
+//         });
+//     });
+
+//     // (opcional) logs quando o processo excede buffer/tempo
+//     child.on('error', (err) => {
+//         console.error('❌ /executar-python-iqs9: falha no spawn/exec:', err.message);
+//     });
+// });
+
+async function medirTempo(fn, label) {
+    console.log(`⏳ ${label}`);
+    const inicio = Date.now();
+    await fn();
+    const seg = (Date.now() - inicio) / 1000;
+    console.log(`✅ ${label} Executado: (tempo: ${seg.toFixed(2)}s)`);
+    return seg;
+}
+
+async function executarSequencialmente(datahora) {
     console.log("⚠️ Iniciando a sequência de requisições...");
-    campo = 'IQS9';
+    const campo = 'IQS9';
+    let total = 0;
+
     try {
-        console.log("⏳ Atualizando Base de Claims");
-        let inicio = Date.now();
-        // Primeira requisição
-        await axios.post('https://brszon110730.weg.net:3000/executar-python-iqs9', { campo }, { httpsAgent });
-        let fim = Date.now();
-        console.log(`✅ Base de Claims Atualizada (tempo: ${(fim - inicio) / 1000}s)`);
+        total += await medirTempo(
+            () => axios.post('https://brszon110730.weg.net:3000/executar-python-iqs9', {}, { httpsAgent }),
+            'Atualizando Base de Claims'
+        );
 
-        console.log("⏳ Atualizando Descrições");
-        inicio = Date.now();
-        // Segunda requisição
-        await axios.post('https://brszon110730.weg.net:3000/updateContent', {}, { httpsAgent });
-        fim = Date.now();
-        console.log(`✅ Descrições Atualizadas (tempo: ${(fim - inicio) / 1000}s)`);
+        total += await medirTempo(
+            () => axios.post('https://brszon110730.weg.net:3000/updateContent', {}, { httpsAgent }),
+            'Atualizando Descrições'
+        );
 
-        // console.log("⏳ Criando ZZs");
-        // inicio = Date.now();
-        // // Terceira requisição
-        // await axios.post('https://brszon110730.weg.net:3000/createZZ', {}, { httpsAgent });
-        // fim = Date.now();
-        // console.log(`✅ ZZs Criados (tempo: ${(fim - inicio) / 1000}s)`);
+        // total += await medirTempo(
+        //     () => axios.post('https://brszon110730.weg.net:3000/qtdAtividades', {}, { httpsAgent }),
+        //     'Atualizando Volume de Atividades'
+        // );
 
+        total += await medirTempo(
+            () => axios.post('https://brszon110730.weg.net:3000/encerrar-claim', {}, { httpsAgent }),
+            'Encerrando Consultas (ZO)'
+        );
+
+        total += await medirTempo(
+            () => axios.post('https://brszon110730.weg.net:3000/createZZ', {}, { httpsAgent }),
+            'Criando ZZs'
+        );
+
+        console.log(`✅ Tempo total de execução: ${total.toFixed(2)}s`);
         console.log("✔️ Sequenciamento Concluído");
-        return "Concluído"
+        return "Concluído";
     } catch (error) {
-        console.log("❌ Erro na sequência de requisições:");
-        console.error('Erro:', error.message);
+        console.error("❌ Erro na sequência:", error?.message || error);
+        return "Erro";
     }
 }
 
-// Chama a função
-// setInterval(executarSequencialmente, 15000);
-setTimeout(() => {
-    executarSequencialmente();
-}, 5000);
+// Execução com intervalo seguro (sem sobreposição)
+async function executarComIntervalo() {
+    const datahora = new Date().toLocaleString();
+    console.log(datahora);
+    await executarSequencialmente(datahora);
+    setTimeout(executarComIntervalo, 50 * 60 * 1000);
+    // setTimeout(executarComIntervalo, 1000);
+}
+
+setTimeout(executarComIntervalo, 5000);
 
 app.post('/atualizar', (req, res) => {
-    console.log(executarSequencialmente());
-    res.json({ status: 'ok' });
+    executarSequencialmente();
+    // res.json({ status: 'ok' });
 
 });
 
@@ -901,7 +1464,8 @@ async function newsAPI() {
         // Função auxiliar para fazer a requisição com uma determinada chave
         const buscarNoticias = (key, palavrasChave) => {
             console.log(`🔑 Tentando chave da API: ${palavrasChave}`);
-            const url = `https://gnews.io/api/v4/top-headlines?lang=pt&country=br&q=${palavrasChave}&token=${key}`;
+            // const url = `https://gnews.io/api/v4/top-headlines?lang=pt&country=br&q=${palavrasChave}&token=${key}`;
+            const url = `https://gnews.io/api/v4/search?lang=pt&country=br&q=${palavrasChave}&token=${key}`;
             return axios.get(url, { httpsAgent });
         };
 
